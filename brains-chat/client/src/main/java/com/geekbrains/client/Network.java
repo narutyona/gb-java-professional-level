@@ -42,7 +42,7 @@ public class Network {
     public static void sendAuth(String login, String password) {
         try {
             if (socket == null || socket.isClosed()) {
-                connect();
+                connect(login);
             }
             out.writeUTF("/auth " + login + " " + password);
         } catch (IOException e) {
@@ -50,7 +50,7 @@ public class Network {
         }
     }
 
-    public static void connect() {
+    public static void connect(String login) {
         try {
             socket = new Socket("localhost", 8189);
             in = new DataInputStream(socket.getInputStream());
@@ -60,7 +60,7 @@ public class Network {
                     while (true) {
                         String msg = in.readUTF();
                         if (msg.startsWith("/authok ")) {
-                            callOnAuthenticated.callback(msg.split("\\s")[1]);
+                            callOnAuthenticated.callback(msg.split("\\s")[1], login);
                             break;
                         }
                     }
