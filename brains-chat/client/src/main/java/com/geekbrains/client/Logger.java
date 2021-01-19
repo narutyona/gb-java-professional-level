@@ -5,7 +5,7 @@ import java.io.*;
 public class Logger implements Closeable {
     public Logger(String login) throws IOException {
         lock = new Object();
-        String path = new File(System.getProperty("user.dir"), login+".txt").getPath();
+        String path = new File(System.getProperty("user.dir"), login + ".txt").getPath();
 
         fw = new FileWriter(path, true);
         bw = new BufferedWriter(fw);

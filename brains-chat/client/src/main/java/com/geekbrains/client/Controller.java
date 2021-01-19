@@ -29,6 +29,7 @@ public class Controller implements Initializable {
     private boolean authenticated;
     private String nickname;
     private String login;
+    private Logger logger;
 
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
@@ -40,6 +41,15 @@ public class Controller implements Initializable {
         clientsList.setManaged(authenticated);
         if (!authenticated) {
             nickname = "";
+            logger.close();
+            logger = null;
+        }
+        else {
+            try {
+                logger = new Logger(login);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -104,11 +114,8 @@ public class Controller implements Initializable {
             } else {
                 String message = msg + System.lineSeparator();
                 textArea.appendText(message);
-                try(Logger logger = new Logger(login)){
+                if (login != null)
                     logger.logMessage(message);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         });
     }
