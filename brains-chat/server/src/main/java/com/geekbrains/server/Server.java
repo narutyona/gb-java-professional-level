@@ -32,6 +32,11 @@ public class Server {
             throwables.printStackTrace();
         }
 
+        try {
+            ClientHandler.closeAll();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("Сервер завершил свою работу");
     }
 

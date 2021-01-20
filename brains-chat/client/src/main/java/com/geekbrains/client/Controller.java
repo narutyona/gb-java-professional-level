@@ -41,7 +41,9 @@ public class Controller implements Initializable {
         clientsList.setManaged(authenticated);
         if (!authenticated) {
             nickname = "";
-            logger.close();
+            if (logger!=null)
+                logger.close();
+
             logger = null;
         }
         else {
