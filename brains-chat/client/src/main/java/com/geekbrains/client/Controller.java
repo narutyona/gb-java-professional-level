@@ -6,6 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -27,6 +28,8 @@ public class Controller implements Initializable {
 
     private boolean authenticated;
     private String nickname;
+    private String login;
+    private Logger logger;
 
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
@@ -38,6 +41,15 @@ public class Controller implements Initializable {
         clientsList.setManaged(authenticated);
         if (!authenticated) {
             nickname = "";
+            logger.close();
+            logger = null;
+        }
+        else {
+            try {
+                logger = new Logger(login);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -62,7 +74,8 @@ public class Controller implements Initializable {
     }
 
     public void sendMsg() {
-        if (Network.sendMsg(msgField.getText())) {
+        String message = msgField.getText();
+        if (Network.sendMsg(message)) {
             msgField.clear();
             msgField.requestFocus();
         }
@@ -83,6 +96,7 @@ public class Controller implements Initializable {
         Network.setCallOnAuthenticated(args -> {
             setAuthenticated(true);
             nickname = args[0].toString();
+            login = args[1].toString();
         });
 
         Network.setCallOnMsgReceived(args -> {
@@ -98,7 +112,10 @@ public class Controller implements Initializable {
                     });
                 }
             } else {
-                textArea.appendText(msg + "\n");
+                String message = msg + System.lineSeparator();
+                textArea.appendText(message);
+                if (login != null)
+                    logger.logMessage(message);
             }
         });
     }
