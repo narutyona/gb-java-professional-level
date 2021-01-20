@@ -41,6 +41,7 @@ public class Controller implements Initializable {
         clientsList.setManaged(authenticated);
         if (!authenticated) {
             nickname = "";
+            login = "";
             if (logger!=null)
                 logger.close();
 
@@ -96,9 +97,9 @@ public class Controller implements Initializable {
         Network.setCallOnCloseConnection(args -> setAuthenticated(false));
 
         Network.setCallOnAuthenticated(args -> {
-            setAuthenticated(true);
             nickname = args[0].toString();
             login = args[1].toString();
+            setAuthenticated(true);
         });
 
         Network.setCallOnMsgReceived(args -> {
