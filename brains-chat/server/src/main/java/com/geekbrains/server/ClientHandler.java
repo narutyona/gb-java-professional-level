@@ -1,9 +1,12 @@
 package com.geekbrains.server;
 
+import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientHandler {
     private String nickname;
@@ -11,6 +14,7 @@ public class ClientHandler {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    private static ExecutorService executorService = Executors.newCachedThreadPool();
 
     public String getNickname() {
         return nickname;
@@ -22,7 +26,7 @@ public class ClientHandler {
             this.socket = socket;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
-            new Thread(() -> {
+            executorService.execute(() -> {
                 try {
                     while (true) {
                         String msg = in.readUTF();
@@ -58,7 +62,7 @@ public class ClientHandler {
                 } finally {
                     ClientHandler.this.disconnect();
                 }
-            }).start();
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -89,5 +93,13 @@ public class ClientHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void closeAll() throws IOException {
+        if (!executorService.isShutdown())
+            synchronized (executorService){
+                if (!executorService.isShutdown())
+                    executorService.shutdownNow();
+            }
     }
 }
